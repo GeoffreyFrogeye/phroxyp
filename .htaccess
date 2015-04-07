@@ -1,0 +1,3 @@
+FallbackResource hooks/index.php
+ErrorDocument 404 hooks/index.php
+RemoveHandler .php
