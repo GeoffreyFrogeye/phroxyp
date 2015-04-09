@@ -50,21 +50,19 @@ class Proxy {
         if ($metd == 'POST') { // TODO Other with data methods
             if (isset($_POST['payload'])) {
                 $postData = stripslashes($_POST['payload']);
-                $reqHeds .= "Content-Length: ".strlen($postData)."\r\n";
-                $reqHeds .= "Connection: Close\r\n";
-                $reqHeds .= "\r\n" . $postData;
             } else {
-                $postinfo = '';
+                $postData = '';
                 foreach ($_POST as $key => $value) {
-                    $postinfo .= $key . '=' . urlencode($value) . '&';
+                    $postData .= $key . '=' . urlencode($value) . '&';
                 }
-                $postinfo = rtrim($postinfo, '&');
-                $reqHeds .= "\r\n" . $postinfo;
+                $postData = rtrim($postData, '&');
             }
+            $reqHeds .= "Content-Length: ".strlen($postData)."\r\n";
+            $reqHeds .= "Connection: Close\r\n";
+            $reqHeds .= "\r\n" . $postData;
         } else {
             $reqHeds .= "Connection: Close\r\n\r\n";
         }
-
 
         $fp = fsockopen($serv, $port, $errno, $errstr, 30);
         if (!$fp) { // TODO ErrorCode, ErrorDocument
