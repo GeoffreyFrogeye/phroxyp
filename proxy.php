@@ -20,7 +20,7 @@ class Proxy {
 
                 $headers = array();
                 foreach ($_SERVER as $name => $value) {
-                    if (substr($name, 0, 5) == 'HTTP_') {
+                    if (substr($name, 0, 5) == 'HTTP_' || substr($name, 0, 8) == 'CONTENT_') {
                         $headers[str_replace(' ', '-', ucwords(strtolower(str_replace('_', ' ', substr($name, 5)))))] = $value;
                     }
                 }
@@ -42,20 +42,35 @@ class Proxy {
         // Converting client request headers to server request headers
         $reqsHedsC = getallheaders();
         foreach ($reqsHedsC as $name => $content) {
-            if ($name != 'Host' && $name != 'Connection') { // TODO More analysis
+            switch ($name) {
+                case 'Host':
+                case 'Connection':
+                case 'Content-Length':
+                break;
+
+                default:
                 $reqHeds .= "$name: $content\r\n";
             }
         }
 
-        if ($metd == 'POST') { // TODO Other with data methods
-            if (isset($_POST['payload'])) {
-                $postData = stripslashes($_POST['payload']);
-            } else {
+        if (isset($reqsHedsC['Content-Type'])) {
+            switch ($reqsHedsC['Content-Type']) { // TODO Other content-types
+                case 'application/x-www-form-urlencoded':
                 $postData = '';
                 foreach ($_POST as $key => $value) {
                     $postData .= $key . '=' . urlencode($value) . '&';
                 }
                 $postData = rtrim($postData, '&');
+                break;
+                
+                case 'TODO':
+                $postData = stripslashes($_POST['payload']);
+                break;
+
+                default:
+                $postData = "Unknown Content-Type";
+                break;
+
             }
             $reqHeds .= "Content-Length: ".strlen($postData)."\r\n";
             $reqHeds .= "Connection: Close\r\n";
