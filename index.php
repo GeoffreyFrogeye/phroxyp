@@ -2,13 +2,13 @@
 
 // PROXY
 // Config
-$serv = 'google.com';
+$serv = 'google.com'; // TODO External file
 $port = 80;
 $root = '';
 $localRoot = '';
 
 // Functions
-function str_replace_once($search, $replace, $subject) {
+function str_replace_once($search, $replace, $subject) { // TODO Credit
     $pos = strpos($subject, $search);
     if ($pos === false) {
         return $subject;
@@ -17,7 +17,7 @@ function str_replace_once($search, $replace, $subject) {
     return substr($subject, 0, $pos) . $replace . substr($subject, $pos + strlen($search));
 }
 
-if (!function_exists('getallheaders')) {
+if (!function_exists('getallheaders')) { // TODO Credit
     function getallheaders() {
         if (!is_array($_SERVER)) {
             return array();
@@ -36,7 +36,7 @@ if (!function_exists('getallheaders')) {
 // Target determination
 $metd = $_SERVER['REQUEST_METHOD'];
 $reqp = $_SERVER['REQUEST_URI'];
-// $reqp = str_replace_once($localRoot, '', $reqp);
+$reqp = str_replace_once($localRoot, '', $reqp); // TODO Reliable method
 
 // Preparing request headers
 $reqHeds = "$metd $root$reqp HTTP/1.1\r\n";
@@ -45,12 +45,12 @@ $reqHeds .= "Host: $serv:$port\r\n";
 // Converting client request headers to server request headers
 $reqsHedsC = getallheaders();
 foreach ($reqsHedsC as $name => $content) {
-    if ($name != 'Host' && $name != 'Connection') {
+    if ($name != 'Host' && $name != 'Connection') { // TODO More analysis
         $reqHeds .= "$name: $content\r\n";
     }
 }
 
-if ($metd == 'POST') { // TODO Waaaay too long
+if ($metd == 'POST') { // TODO Other with data methods
     if (isset($_POST['payload'])) {
         $postData = stripslashes($_POST['payload']);
         $reqHeds .= "Content-Length: ".strlen($postData)."\r\n";
@@ -70,7 +70,7 @@ if ($metd == 'POST') { // TODO Waaaay too long
 
 
 $fp = fsockopen($serv, $port, $errno, $errstr, 30);
-if (!$fp) {
+if (!$fp) { // TODO ErrorCode, ErrorDocument
     echo "Couldn't connect to server\n<br/>$errstr ($errno)<br />\n";
 } else {
     // Sending request
