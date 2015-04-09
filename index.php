@@ -45,18 +45,25 @@ $reqHeds .= "Host: $serv:$port\r\n";
 // Converting client request headers to server request headers
 $reqsHedsC = getallheaders();
 foreach ($reqsHedsC as $name => $content) {
-    if ($name != 'Host') {
+    if ($name != 'Host' && $name != 'Connection') {
         $reqHeds .= "$name: $content\r\n";
     }
 }
 
 if ($metd == 'POST') { // TODO Waaaay too long
-    $postinfo = '';
-    foreach ($_POST as $key => $value) {
-        $postinfo .= $key . '=' . urlencode($value) . '&';
+    if (isset($_POST['payload'])) {
+        $postData = stripslashes($_POST['payload']);
+        $reqHeds .= "Content-Length: ".strlen($postData)."\r\n";
+        $reqHeds .= "Connection: Close\r\n";
+        $reqHeds .= "\r\n" . $postData;
+    } else {
+        $postinfo = '';
+        foreach ($_POST as $key => $value) {
+            $postinfo .= $key . '=' . urlencode($value) . '&';
+        }
+        $postinfo = rtrim($postinfo, '&');
+        $reqHeds .= "\r\n" . $postinfo;
     }
-    $postinfo = rtrim($postinfo, '&');
-    $reqHeds .= "\r\n" . $postinfo;
 } else {
     $reqHeds .= "Connection: Close\r\n\r\n";
 }
@@ -69,13 +76,12 @@ if (!$fp) {
     // Sending request
     fwrite($fp, $reqHeds);
     $resBuf = '';
-    while (!feof($fp)) {
+    while ($get = fgets($fp, 128)) {
         // Getting response
         if ($resBuf === True) { // If headers sent
-            $get = fgets($fp, 128);
             echo $get;
         } else {
-            $resBuf .= fgets($fp, 128);
+            $resBuf .= $get;
             if ($sepPos = strrpos($resBuf, "\r\n\r\n")) { // Headers have been retrieved
                 $resHeds = explode("\r\n", substr($resBuf, 0, $sepPos));
                 foreach ($resHeds as $resHed) { // Setting headers
@@ -91,5 +97,4 @@ if (!$fp) {
     }
     fclose($fp);
 }
-
 ?>
