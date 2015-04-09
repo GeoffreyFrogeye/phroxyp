@@ -47,47 +47,18 @@ class Proxy {
             switch ($name) {
                 case 'Host':
                 case 'Connection':
-                case 'Content-Length':
                 break;
 
                 default:
                 $reqHeds .= "$name: $content\r\n";
             }
         }
-
-        if (isset($reqsHedsC['Content-Type'])) {
-            switch ($reqsHedsC['Content-Type']) { // TODO Other content-types
-                case 'application/x-www-form-urlencoded':
-                $postData = '';
-                foreach ($_POST as $key => $value) {
-                    $postData .= $key . '=' . urlencode($value) . '&';
-                }
-                $postData = rtrim($postData, '&');
-                break;
-                
-                case 'application/json':
-                $postData = file_get_contents('php://input');
-                break;
-
-                case 'TODO':
-                $postData = stripslashes($_POST['payload']);
-                break;
-
-                default:
-                $postData = "Unknown Content-Type";
-                break;
-
-            }
-            $reqHeds .= "Content-Length: ".strlen($postData)."\r\n";
-            $reqHeds .= "Connection: Close\r\n";
-            $reqHeds .= "\r\n" . $postData;
-        } else {
-            $reqHeds .= "Connection: Close\r\n\r\n";
-        }
+        
+        $reqHeds .= "Connection: Close\r\n\r\n".file_get_contents('php://input');
 
         $fp = fsockopen($serv, $port, $errno, $errstr, 30);
         if (!$fp) { // TODO ErrorCode, ErrorDocument
-            echo "Couldn't connect to server\n<br/>$errstr ($errno)<br />\n";
+            echo "Couldn't connect to server.\n<br/>$errstr ($errno)<br />\n";
         } else {
             // Sending request
             fwrite($fp, $reqHeds);
