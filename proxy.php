@@ -20,8 +20,10 @@ class Proxy {
 
                 $headers = array();
                 foreach ($_SERVER as $name => $value) {
-                    if (substr($name, 0, 5) == 'HTTP_' || substr($name, 0, 8) == 'CONTENT_') {
+                    if (substr($name, 0, 5) == 'HTTP_') {
                         $headers[str_replace(' ', '-', ucwords(strtolower(str_replace('_', ' ', substr($name, 5)))))] = $value;
+                    } else if (substr($name, 0, 8) == 'CONTENT_') {
+                        $headers[str_replace(' ', '-', ucwords(strtolower(str_replace('_', ' ', $name))))] = $value;
                     }
                 }
                 return $headers;
@@ -63,6 +65,10 @@ class Proxy {
                 $postData = rtrim($postData, '&');
                 break;
                 
+                case 'application/json':
+                $postData = file_get_contents('php://input');
+                break;
+
                 case 'TODO':
                 $postData = stripslashes($_POST['payload']);
                 break;
