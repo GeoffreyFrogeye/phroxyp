@@ -31,7 +31,9 @@ class Proxy {
         // Target determination
         $metd = $_SERVER['REQUEST_METHOD'];
         $reqp = $_SERVER['REQUEST_URI'];
-        $reqp = str_replace_once($localRoot, '', $reqp); // TODO Reliable method
+        if ($localRoot != '') {
+            $reqp = str_replace_once($localRoot, '', $reqp); // TODO Reliable method
+        }
 
         // Preparing request headers
         $reqHeds = "$metd $root$reqp HTTP/1.1\r\n";
