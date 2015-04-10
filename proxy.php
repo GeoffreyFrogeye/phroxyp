@@ -1,7 +1,7 @@
 <?php
 
 class Proxy {
-    public function __construct($serv, $port = 80, $root = '/', $localRoot = '') {
+    public function __construct($serv, $port = 80, $root = '', $localRoot = '') {
         // Functions
         function str_replace_once($search, $replace, $subject) { // TODO Credit
             $pos = strpos($subject, $search);

@@ -40,9 +40,9 @@ Where:
 
 * `example.com` is the target hostname
 * `80` is the target port (default: `80`)
-* `/remoteDir` is the directory to point on on the target (default: `/`)
+* `/remoteDir` is the directory to point on on the target (default: ``)
 	* For example, if set to `/superapplication`, it will redirect to `example.com/superapplication`
-* `/localDir` is the directory that contains the file.
+* `/localDir` is the directory that contains the file (default: ``)
 	* For example, if you need to type `mydomain.com/superproxy/index.php` to access this file, set this to `/superproxy`
 
 Then, create the `.htaccess` file in order to redirect every request made in `localDir` to `index.php` that will handle it. In most situations, you will onyl need the following line.
